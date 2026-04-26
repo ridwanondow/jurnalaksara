@@ -3,183 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Omahbuku</title>
+    <title>Omahbuku — Ruang Temu Pikiran</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Instrument+Serif:ital@0;1&display=swap');
-        :root { --bg: #f5f1e8; --card: #ffffff; --text: #111111; --line: #dddddd; --shadow: #111111; }
-        .dark { --bg: #0d0d0d; --card: #171717; --text: #f5f5f5; --line: #2a2a2a; --shadow: #ffffff; }
-        body { background: var(--bg); color: var(--text); font-family: Inter, sans-serif; transition: 0.5s; overflow-x: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Instrument+Serif:ital@0;1&display=swap');
+        
+        :root { --bg: #f5f1e8; --card: #ffffff; --text: #111111; --line: #dddddd; --shadow: #111111; --accent: #4a5d4a; }
+        .dark { --bg: #0d0d0d; --card: #171717; --text: #f5f5f5; --line: #2a2a2a; --shadow: #ffffff; --accent: #a3b8a3; }
+
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; transition: background 0.8s ease; overflow-x: hidden; }
         .serif { font-family: 'Instrument Serif', serif; }
-        .card { background: var(--card); border: 1px solid var(--line); border-radius: 28px; box-shadow: 8px 8px 0 var(--shadow); transition: 0.3s; }
-        .btn { padding: 12px 22px; border: 1px solid var(--text); border-radius: 999px; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; font-weight: 700; cursor: pointer; }
-        .btn:hover { background: var(--text); color: var(--bg); transform: scale(1.05); }
-        .hidden { display: none; }
-        textarea::placeholder { opacity: 0.3; }
+        
+        /* Overlay Pintu Masuk */
+        #gate-overlay { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transition: all 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        .card { background: var(--card); border: 1px solid var(--line); border-radius: 24px; box-shadow: 6px 6px 0 var(--shadow); transition: 0.4s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 10px 10px 0 var(--shadow); }
+
+        .input-minimal { background: transparent; border-bottom: 2px solid var(--line); outline: none; transition: 0.3s; }
+        .input-minimal:focus { border-color: var(--accent); }
+
+        @keyframes blink { 50% { opacity: 0; } }
+        .cursor { display: inline-block; width: 8px; height: 1em; background: currentColor; margin-left: 4px; animation: blink 1s infinite; vertical-align: middle; }
     </style>
 </head>
-<body class="min-h-screen p-6 md:p-12">
+<body class="antialiased">
 
-<div class="max-w-3xl mx-auto">
-    <div class="flex justify-between items-start mb-12">
-        <div>
-            <h1 onclick="resetUser()" class="serif text-5xl italic cursor-pointer">omahbuku.</h1>
-            <p id="trend" class="text-[10px] uppercase tracking-[0.3em] opacity-40 mt-3 italic">70 sedang online</p>
-        </div>
-        <button onclick="toggleMode()" class="btn px-4">Mode</button>
-    </div>
-
-    <section id="step1" class="text-center py-24">
-        <h2 class="serif text-5xl italic mb-10">Siapa namamu?</h2>
-        <input id="nama" class="bg-transparent border-b border-black dark:border-white w-full max-w-xs text-center text-3xl serif outline-none pb-2" placeholder="..." autocomplete="off">
-        <div class="mt-10"><button onclick="saveName()" class="btn">Masuk</button></div>
-    </section>
-
-    <section id="step2" class="hidden">
-        <p id="halo" class="uppercase tracking-[0.5em] text-[10px] opacity-40 mb-8 text-center"></p>
-        <textarea id="input" placeholder="Apa yang sedang kamu cari atau rasakan saat ini?" class="w-full bg-transparent text-center serif text-4xl min-h-[300px] outline-none resize-none leading-tight"></textarea>
-        <div class="text-center mt-8"><button onclick="resapi()" id="btnResapi" class="btn">Temukan</button></div>
-    </section>
-
-    <section id="step3" class="hidden mt-4">
-        <div class="card p-10 relative overflow-hidden">
-            <p id="reply" class="serif text-3xl md:text-4xl italic leading-relaxed"></p>
-            
-            <div class="mt-10 pt-6 border-t border-dashed flex justify-between text-[10px] uppercase tracking-widest opacity-40">
-                <span id="cat">Refleksi</span>
-                <a href="https://tiktok.com/@belajarsantuy" target="_blank" class="hover:underline">@belajarsantuy</a>
+    <div id="gate-overlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--bg)] px-6 text-center">
+        <div class="max-w-md w-full">
+            <h1 class="serif text-4xl mb-8 italic reveal" id="gate-title">Di rumah ini, kami memanggilmu siapa?</h1>
+            <div class="space-y-6 reveal" style="transition-delay: 300ms;" id="gate-form">
+                <input type="text" id="nameInput" placeholder="Tulis namamu..." autofocus class="input-minimal text-2xl w-full py-2 text-center serif italic placeholder:opacity-20">
+                <button onclick="enterHome()" class="block w-full py-4 bg-[var(--text)] text-[var(--bg)] rounded-full font-medium shadow-xl hover:scale-105 transition">Masuk ke Omahbuku</button>
             </div>
         </div>
-        <div class="flex gap-8 justify-center mt-12">
-            <button onclick="ulang()" class="underline opacity-50 text-[10px] uppercase tracking-widest hover:opacity-100">Tulis Lagi</button>
-            <button onclick="copy()" class="underline opacity-50 text-[10px] uppercase tracking-widest hover:opacity-100">Salin</button>
-        </div>
-    </section>
+    </div>
 
-    <section id="libSection" class="mt-24 border-t border-black/10 dark:border-white/10 pt-12">
-        <p class="text-center text-[10px] uppercase tracking-[0.4em] opacity-30 mb-10">Literasi untuk jiwamu</p>
-        <div id="books" class="grid md:grid-cols-2 gap-8"></div>
-    </section>
-</div>
+    <main id="main-content" class="opacity-0 max-w-2xl mx-auto py-12 px-6 transition-opacity duration-1000">
+        <header class="flex justify-between items-center mb-16">
+            <div>
+                <h2 class="serif text-3xl italic">Omahbuku</h2>
+                <p id="greeting" class="text-[10px] opacity-40 tracking-[0.3em] uppercase mt-2"></p>
+                <p id="trend-text" class="text-[9px] italic opacity-60 mt-1"></p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="toggleMode()" class="w-10 h-10 rounded-full border border-[var(--line)] flex items-center justify-center">🌓</button>
+                <button onclick="resetUser()" class="w-10 h-10 rounded-full border border-[var(--line)] flex items-center justify-center opacity-30">↺</button>
+            </div>
+        </header>
 
-<script>
-    /* KONFIGURASI API */
-    const API = "https://script.google.com/macros/s/AKfycbyT4pGYIoOKk8dfRkRA3JXjUKeh3bKUkheVz9iYR_5sIzA9gomouqIdd24S4tr3OfEijA/exec";
-    let DB = { engine: [], library: [] };
+        <section class="mb-16">
+            <div class="card p-10 mb-8 min-h-[180px] flex items-center">
+                <div id="chat-output" class="w-full">
+                    <p id="reply" class="serif text-3xl leading-snug italic opacity-60">Apa yang sedang memenuhi pikiranmu hari ini?</p>
+                </div>
+            </div>
+            <div class="relative group">
+                <input type="text" id="userInput" autocomplete="off" class="card w-full py-6 px-8 pr-28 bg-transparent outline-none text-lg" placeholder="Ceritakan sesuatu...">
+                <button onclick="sendMessage()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-[var(--text)] text-[var(--bg)] px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest">Tanya</button>
+            </div>
+        </section>
 
-    window.onload = async () => {
-        if(localStorage.getItem("omahbuku_mode") === "dark") document.body.classList.add("dark");
-        const name = localStorage.getItem("omahbuku_name");
-        if(name) {
-            document.getElementById("step1").classList.add("hidden");
-            document.getElementById("step2").classList.remove("hidden");
-            document.getElementById("halo").innerText = "SELAMAT DATANG, " + name.toUpperCase();
+        <section id="library-section">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="h-[1px] flex-1 bg-[var(--line)]"></div>
+                <h3 class="serif italic text-xl opacity-50">Bacaan untukmu</h3>
+                <div class="h-[1px] flex-1 bg-[var(--line)]"></div>
+            </div>
+            <div id="books-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </section>
+
+        <footer class="mt-24 text-center pb-12">
+            <p class="text-[10px] tracking-[0.4em] opacity-20 uppercase font-bold">Omahbuku • Ruang Temu Pikiran</p>
+        </footer>
+    </main>
+
+    <script>
+        const API = "https://script.google.com/macros/s/AKfycbyT4pGYIoOKk8dfRkRA3JXjUKeh3bKUkheVz9iYR_5sIzA9gomouqIdd24S4tr3OfEijA/exec";
+        let DB = { engine: [], library: [] };
+
+        window.onload = () => {
+            fetchData();
+            checkUser();
+            setTimeout(() => document.getElementById('gate-title').classList.add('active'), 400);
+            setTimeout(() => document.getElementById('gate-form').classList.add('active'), 700);
+            
+            document.getElementById('nameInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') enterHome(); });
+            document.getElementById('userInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
+        };
+
+        async function fetchData() {
+            try {
+                const res = await fetch(API);
+                const data = await res.json();
+                DB.engine = data.engine;
+                DB.library = data.library;
+                if(data.trend) document.getElementById("trend-text").innerText = data.trend;
+                renderBooks(DB.library.slice(0, 4));
+            } catch (e) { console.error("Database error"); }
         }
-        await loadData();
-    };
 
-    async function loadData() {
-        try {
-            const res = await fetch(API);
-            const data = await res.json();
-            DB = data;
-            if (data.trend) {
-                document.getElementById("trend").innerText = data.trend;
+        function checkUser() {
+            const name = localStorage.getItem("omahbuku_user");
+            if (name) {
+                document.getElementById('gate-overlay').style.display = 'none';
+                document.getElementById('main-content').classList.remove('opacity-0');
+                document.getElementById('greeting').innerText = `Selamat datang kembali, ${name}`;
             }
-            renderBooks(data.library.sort((a,b) => b.priority - a.priority));
-        } catch(e) { 
-            document.getElementById("trend").innerText = "Koneksi batin terputus."; 
-        }
-    }
-
-    function saveName() {
-        const n = document.getElementById("nama").value.trim();
-        if(!n) return;
-        localStorage.setItem("omahbuku_name", n);
-        location.reload();
-    }
-
-    function resapi() {
-        const text = document.getElementById("input").value.trim();
-        if(!text) return;
-        const name = localStorage.getItem("omahbuku_name") || "Pembaca";
-        document.getElementById("btnResapi").innerText = "Mencari...";
-
-        const scoredBooks = DB.library.map(b => {
-            let s = 0;
-            const tags = (b.tags || "").split(",");
-            tags.forEach(t => { if(text.toLowerCase().includes(t.trim().toLowerCase())) s += 20; });
-            return {...b, score: s + (Number(b.priority) || 0)};
-        }).sort((a,b) => b.score - a.score);
-
-        const bukuUtama = scoredBooks[0];
-        renderBooks(scoredBooks);
-
-        let match = null;
-        let topScore = 0;
-        DB.engine.forEach(row => {
-            let score = 0;
-            const kws = (row.keywords || "").split(",");
-            kws.forEach(k => { if(text.toLowerCase().includes(k.trim().toLowerCase())) score += k.trim().length; });
-            score += (Number(row.priority) || 0);
-            if(score > topScore) { topScore = score; match = row; }
-        });
-
-        let balasanBase = "Terima kasih sudah berbagi. Kadang diam adalah cara terbaik.";
-        let kategori = "Refleksi";
-        if(match && topScore > 0) {
-            const r = [match.reply_1, match.reply_2, match.reply_3].filter(Boolean);
-            balasanBase = r[Math.floor(Math.random() * r.length)];
-            kategori = match.category;
         }
 
-        let finalMsg = balasanBase.replace(/\[nama\]/g, name);
-        if (bukuUtama && bukuUtama.score > 5) {
-            finalMsg += `<br><br><span class="text-xl opacity-80 italic">Mungkin kamu butuh membaca <b>"${bukuUtama.title}"</b> untuk lebih tenang.</span>`;
+        function enterHome() {
+            const name = document.getElementById('nameInput').value.trim();
+            if (!name) return;
+            localStorage.setItem("omahbuku_user", name);
+            location.reload();
         }
 
-        setTimeout(() => {
-            document.getElementById("step2").classList.add("hidden");
-            document.getElementById("step3").classList.remove("hidden");
-            document.getElementById("cat").innerText = kategori;
-            document.getElementById("reply").innerHTML = finalMsg;
+        function sendMessage() {
+            const input = document.getElementById("userInput");
+            const text = input.value.trim();
+            if (!text) return;
 
-            fetch(API, { 
-                method: "POST", 
-                mode: "no-cors",
-                body: JSON.stringify({
-                    userId: name,
-                    input: text,
-                    reply: finalMsg.replace(/<[^>]*>?/gm, ''), 
-                    category: kategori,
-                    book: bukuUtama?.title || ""
-                })
-            });
-        }, 800);
-    }
+            const replyEl = document.getElementById("reply");
+            replyEl.innerHTML = "Meresapi...";
+            replyEl.classList.add('opacity-30');
 
-    function renderBooks(arr) {
-        document.getElementById("books").innerHTML = arr.map(b => `
-            <a href="${b.link}" target="_blank" class="card p-8 block hover:translate-y-[-4px]">
-                <div class="text-[9px] opacity-40 mb-2 uppercase tracking-[0.2em]">${b.category}</div>
-                <div class="serif text-2xl italic mb-3 leading-tight">${b.title}</div>
-                <p class="text-xs opacity-60 leading-relaxed font-light">${b.desc}</p>
-            </a>
-        `).join("");
-    }
+            const match = DB.engine.find(w => text.toLowerCase().includes(w.keywords.toLowerCase()));
+            const name = localStorage.getItem("omahbuku_user") || "Tamu";
+            const kategori = match?.category || "Refleksi";
 
-    function toggleMode() {
-        document.body.classList.toggle("dark");
-        localStorage.setItem("omahbuku_mode", document.body.classList.contains("dark") ? "dark" : "light");
-    }
-    
-    function resetUser() { if(confirm("Mulai ulang identitas?")) { localStorage.clear(); location.reload(); } }
-    function ulang() { location.reload(); }
-    function copy() { 
-        const txt = document.getElementById("reply").innerText;
-        navigator.clipboard.writeText(txt); 
-        alert("Pesan tersalin."); 
-    }
-</script>
+            // LOGIKA ANTI-DOMINAN: Pilih buku secara acak dari kategori yang sama
+            const koleksiBukuSesuai = DB.library.filter(b => b.category === kategori);
+            const bukuTerpilih = koleksiBukuSesuai.length > 0 
+                ? koleksiBukuSesuai[Math.floor(Math.random() * koleksiBukuSesuai.length)]
+                : DB.library[Math.floor(Math.random() * DB.library.length)];
+
+            setTimeout(() => {
+                let finalMsg = match ? match.reply_1 : "Terima kasih sudah berbagi. Kadang jawaban terbaik ada di dalam keheninganmu sendiri.";
+                finalMsg = finalMsg.replace(/\[nama\]/g, name);
+                
+                replyEl.classList.remove('opacity-30');
+                replyEl.innerHTML = finalMsg + '<span class="cursor"></span>';
+                
+                // POST ke Google Apps Script
+                fetch(API, { 
+                    method: "POST", 
+                    mode: "no-cors",
+                    body: JSON.stringify({ 
+                        userId: name, 
+                        input: text, 
+                        reply: finalMsg.replace(/<[^>]*>?/gm, ''), 
+                        category: kategori,
+                        book: bukuTerpilih?.title || "",
+                        device: "web-omahbuku"
+                    })
+                });
+                input.value = "";
+            }, 800);
+        }
+
+        function renderBooks(arr) {
+            const grid = document.getElementById("books-grid");
+            grid.innerHTML = arr.map(b => `
+                <a href="${b.link}" target="_blank" class="card p-8 block">
+                    <div class="text-[9px] opacity-40 mb-3 uppercase tracking-[0.2em]">${b.category}</div>
+                    <div class="serif text-2xl italic mb-3 leading-tight">${b.title}</div>
+                    <p class="text-xs opacity-50 leading-relaxed line-clamp-2">${b.desc}</p>
+                </a>
+            `).join("");
+        }
+
+        function toggleMode() { document.body.classList.toggle("dark"); }
+        function resetUser() { if(confirm("Mulai ulang identitas?")) { localStorage.clear(); location.reload(); } }
+    </script>
 </body>
 </html>
