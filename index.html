@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>AKSARA</title>
+    <title>Omahbuku</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Instrument+Serif:ital@0;1&display=swap');
@@ -23,8 +23,8 @@
 <div class="max-w-3xl mx-auto">
     <div class="flex justify-between items-start mb-12">
         <div>
-            <h1 onclick="resetUser()" class="serif text-5xl italic cursor-pointer">aksara.</h1>
-            <p id="trend" class="text-[10px] uppercase tracking-[0.3em] opacity-40 mt-3 italic">Menyelaraskan frekuensi...</p>
+            <h1 onclick="resetUser()" class="serif text-5xl italic cursor-pointer">omahbuku.</h1>
+            <p id="trend" class="text-[10px] uppercase tracking-[0.3em] opacity-40 mt-3 italic">70 sedang online</p>
         </div>
         <button onclick="toggleMode()" class="btn px-4">Mode</button>
     </div>
@@ -37,8 +37,8 @@
 
     <section id="step2" class="hidden">
         <p id="halo" class="uppercase tracking-[0.5em] text-[10px] opacity-40 mb-8 text-center"></p>
-        <textarea id="input" placeholder="Tumpahkan resahmu di sini..." class="w-full bg-transparent text-center serif text-4xl min-h-[300px] outline-none resize-none leading-tight"></textarea>
-        <div class="text-center mt-8"><button onclick="resapi()" id="btnResapi" class="btn">Resapi</button></div>
+        <textarea id="input" placeholder="Apa yang sedang kamu cari atau rasakan saat ini?" class="w-full bg-transparent text-center serif text-4xl min-h-[300px] outline-none resize-none leading-tight"></textarea>
+        <div class="text-center mt-8"><button onclick="resapi()" id="btnResapi" class="btn">Temukan</button></div>
     </section>
 
     <section id="step3" class="hidden mt-4">
@@ -47,7 +47,7 @@
             
             <div class="mt-10 pt-6 border-t border-dashed flex justify-between text-[10px] uppercase tracking-widest opacity-40">
                 <span id="cat">Refleksi</span>
-                <span>@aksara.journal</span>
+                <a href="https://tiktok.com/@belajarsantuy" target="_blank" class="hover:underline">@belajarsantuy</a>
             </div>
         </div>
         <div class="flex gap-8 justify-center mt-12">
@@ -68,8 +68,8 @@
     let DB = { engine: [], library: [] };
 
     window.onload = async () => {
-        if(localStorage.getItem("aksara_mode") === "dark") document.body.classList.add("dark");
-        const name = localStorage.getItem("aksara_name");
+        if(localStorage.getItem("omahbuku_mode") === "dark") document.body.classList.add("dark");
+        const name = localStorage.getItem("omahbuku_name");
         if(name) {
             document.getElementById("step1").classList.add("hidden");
             document.getElementById("step2").classList.remove("hidden");
@@ -83,7 +83,9 @@
             const res = await fetch(API);
             const data = await res.json();
             DB = data;
-            document.getElementById("trend").innerText = data.trend;
+            if (data.trend) {
+                document.getElementById("trend").innerText = data.trend;
+            }
             renderBooks(data.library.sort((a,b) => b.priority - a.priority));
         } catch(e) { 
             document.getElementById("trend").innerText = "Koneksi batin terputus."; 
@@ -93,17 +95,16 @@
     function saveName() {
         const n = document.getElementById("nama").value.trim();
         if(!n) return;
-        localStorage.setItem("aksara_name", n);
+        localStorage.setItem("omahbuku_name", n);
         location.reload();
     }
 
     function resapi() {
         const text = document.getElementById("input").value.trim();
         if(!text) return;
-        const name = localStorage.getItem("aksara_name") || "Jiwa";
-        document.getElementById("btnResapi").innerText = "Meresapi...";
+        const name = localStorage.getItem("omahbuku_name") || "Pembaca";
+        document.getElementById("btnResapi").innerText = "Mencari...";
 
-        // --- 1. CARI BUKU TERBAIK (SINKRON DENGAN LOGS) ---
         const scoredBooks = DB.library.map(b => {
             let s = 0;
             const tags = (b.tags || "").split(",");
@@ -112,9 +113,8 @@
         }).sort((a,b) => b.score - a.score);
 
         const bukuUtama = scoredBooks[0];
-        renderBooks(scoredBooks); // Update list buku di bawah
+        renderBooks(scoredBooks);
 
-        // --- 2. CARI BALASAN ENGINE ---
         let match = null;
         let topScore = 0;
         DB.engine.forEach(row => {
@@ -133,31 +133,24 @@
             kategori = match.category;
         }
 
-        // --- 3. GABUNGKAN BALASAN + NAMA BUKU ---
         let finalMsg = balasanBase.replace(/\[nama\]/g, name);
-        
-        // Jika skor kecocokan buku tinggi, masukkan nama bukunya
         if (bukuUtama && bukuUtama.score > 5) {
             finalMsg += `<br><br><span class="text-xl opacity-80 italic">Mungkin kamu butuh membaca <b>"${bukuUtama.title}"</b> untuk lebih tenang.</span>`;
         }
 
-        // --- 4. TAMPILKAN ---
         setTimeout(() => {
             document.getElementById("step2").classList.add("hidden");
             document.getElementById("step3").classList.remove("hidden");
             document.getElementById("cat").innerText = kategori;
-            
-            // Gunakan innerHTML agar tag <b> dan <br> terbaca
             document.getElementById("reply").innerHTML = finalMsg;
 
-            // Log ke Spreadsheet
             fetch(API, { 
                 method: "POST", 
                 mode: "no-cors",
                 body: JSON.stringify({
                     userId: name,
                     input: text,
-                    reply: finalMsg.replace(/<[^>]*>?/gm, ''), // Bersihkan tag HTML untuk log
+                    reply: finalMsg.replace(/<[^>]*>?/gm, ''), 
                     category: kategori,
                     book: bukuUtama?.title || ""
                 })
@@ -177,7 +170,7 @@
 
     function toggleMode() {
         document.body.classList.toggle("dark");
-        localStorage.setItem("aksara_mode", document.body.classList.contains("dark") ? "dark" : "light");
+        localStorage.setItem("omahbuku_mode", document.body.classList.contains("dark") ? "dark" : "light");
     }
     
     function resetUser() { if(confirm("Mulai ulang identitas?")) { localStorage.clear(); location.reload(); } }
