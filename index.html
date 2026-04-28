@@ -7,58 +7,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Montserrat:wght@200;400;600&family=Playfair+Display:ital,wght@0,400;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
     <style>
-        :root { --dark: #0a0a0a; --gold: #d4af37; --sand: #c2a381; --white: #ffffff; }
-        * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
+        :root { --dark: #0a0a0a; --gold: #d4af37; --white: #ffffff; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: var(--white); overflow-x: hidden; line-height: 1.6; }
-        
-        /* Typography */
-        h1, h2 { font-family: 'Playfair Display', serif; }
-        .font-accent { font-family: 'Cormorant Garamond', serif; font-style: italic; }
-
-        /* Hero */
-        .hero { height: 100vh; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; position: relative; text-align: center; transition: background-image 1s ease-in-out; }
-        .hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.2), var(--dark)); }
+        .hero { height: 100vh; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; position: relative; text-align: center; }
+        .hero::after { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
         .hero-content { position: relative; z-index: 10; padding: 20px; }
-
-        section { padding: 80px 20px; max-width: 800px; margin: 0 auto; text-align: center; }
-        .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 15px; padding: 30px; margin-bottom: 30px; backdrop-filter: blur(8px); }
-        
-        /* Mempelai */
-        .profile-img { width: 160px; height: 160px; border-radius: 50%; border: 3px solid var(--gold); object-fit: cover; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .btn-gold { background: var(--gold); border: none; color: var(--dark); padding: 14px 35px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: 0.3s; text-decoration: none; display: inline-block; font-size: 13px; letter-spacing: 1px; }
-        .btn-gold:hover { transform: translateY(-3px); background: var(--sand); }
-        
-        /* Story Timeline */
-        .story-card { text-align: left; margin-bottom: 30px; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.02); border: 1px solid rgba(212, 175, 55, 0.1); }
-        .story-img { width: 100%; height: 250px; object-fit: cover; border-bottom: 2px solid var(--gold); }
-        .story-text { padding: 20px; font-size: 14px; opacity: 0.9; }
-
-        /* Countdown */
-        .timer-wrap { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
-        .timer-box { background: rgba(212, 175, 55, 0.1); padding: 10px; border-radius: 10px; min-width: 70px; border: 1px solid rgba(212, 175, 55, 0.3); }
-        .timer-box span { display: block; font-size: 24px; font-weight: bold; color: var(--gold); }
-
-        /* Floating Music */
-        .music-btn { position: fixed; bottom: 25px; left: 25px; z-index: 999; background: var(--gold); width: 50px; height: 50px; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-
+        section { padding: 60px 20px; max-width: 800px; margin: 0 auto; text-align: center; }
+        .card { background: rgba(255,255,255,0.05); border: 1px solid var(--gold); border-radius: 15px; padding: 25px; margin-bottom: 20px; }
+        .profile-img { width: 140px; height: 140px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; }
+        .btn-gold { background: var(--gold); color: var(--dark); padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: bold; cursor: pointer; border: none; display: inline-block; }
         #content { display: none; }
-        #loading-screen { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        #loading { position: fixed; inset: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; z-index: 9999; }
     </style>
 </head>
 <body>
 
-<div id="loading-screen">Memuat Undangan...</div>
+<div id="loading">Menyiapkan Undangan...</div>
 
-<div class="music-btn" id="mBtn" onclick="toggleMusic()">🎵</div>
 <audio id="audio" loop><source id="mSource" src=""></audio>
 
 <section class="hero" id="hero-bg">
-    <div class="hero-content" data-aos="fade-up">
-        <p style="letter-spacing: 5px; font-size: 11px; margin-bottom: 10px;">THE WEDDING OF</p>
-        <h1 id="nama-utama" style="font-size: 3.2rem; margin-bottom: 20px;"></h1>
-        <div class="card" style="background: rgba(0,0,0,0.5);">
-            <p style="font-size: 12px; margin-bottom: 10px; opacity: 0.8;">Kepada Yth:</p>
-            <h2 id="guest-to" style="margin-bottom: 25px; font-weight: 400;">Tamu Undangan</h2>
+    <div class="hero-content">
+        <h1 id="nama-utama" style="font-family: 'Playfair Display'; font-size: 3rem;"></h1>
+        <div class="card">
+            <p>Yth. <br><span id="guest-to" style="font-weight: bold; font-size: 1.2rem;"></span></p>
+            <br>
             <button class="btn-gold" onclick="openInv()">BUKA UNDANGAN</button>
         </div>
     </div>
@@ -66,200 +40,78 @@
 
 <div id="content">
     <section>
-        <h2 class="font-accent" style="color: var(--gold); font-size: 2.5rem; margin-bottom: 50px;">Mempelai</h2>
+        <h2 style="font-family: 'Playfair Display'; color: var(--gold);">Mempelai</h2>
+        <br>
         <div data-aos="fade-up">
-            <img id="p-foto" class="profile-img" src="">
-            <h3 id="p-nama" style="font-size: 1.8rem;"></h3>
-            <p id="p-ortu" style="font-size: 13px; opacity: 0.7; margin-top: 5px;"></p>
+            <img id="p-foto" class="profile-img">
+            <h3 id="p-nama"></h3>
+            <p id="p-ortu" style="font-size: 0.8rem; opacity: 0.7;"></p>
         </div>
-        <div style="font-size: 40px; margin: 40px 0; color: var(--gold); font-family: 'Cormorant Garamond';">&</div>
+        <div style="font-size: 2rem; margin: 20px 0;">&</div>
         <div data-aos="fade-up">
-            <img id="w-foto" class="profile-img" src="">
-            <h3 id="w-nama" style="font-size: 1.8rem;"></h3>
-            <p id="w-ortu" style="font-size: 13px; opacity: 0.7; margin-top: 5px;"></p>
+            <img id="w-foto" class="profile-img">
+            <h3 id="w-nama"></h3>
+            <p id="w-ortu" style="font-size: 0.8rem; opacity: 0.7;"></p>
         </div>
     </section>
+
+    <section id="story-list"></section>
 
     <section>
-        <div class="card" data-aos="zoom-in">
-            <h3 id="disp-tgl" style="font-family: 'Playfair Display'; margin-bottom: 15px;"></h3>
-            <div class="timer-wrap">
-                <div class="timer-box"><span id="d">0</span><small>Hari</small></div>
-                <div class="timer-box"><span id="h">0</span><small>Jam</small></div>
-                <div class="timer-box"><span id="m">0</span><small>Menit</small></div>
-                <div class="timer-box"><span id="s">0</span><small>Detik</small></div>
-            </div>
-            <div style="margin-top: 30px;">
-                <h4 style="color:var(--gold);">Lokasi Acara</h4>
-                <p class="font-accent" id="disp-lokasi" style="font-size: 1.1rem; margin-bottom: 15px;"></p>
-                <a id="btn-maps" href="#" target="_blank" class="btn-gold" style="font-size: 11px;">BUKA GOOGLE MAPS</a>
-            </div>
+        <div class="card">
+            <h3 style="color: var(--gold);">Kado Digital</h3>
+            <p id="bank-info"></p>
         </div>
     </section>
-
-    <section>
-        <h2 class="font-accent" style="color: var(--gold); margin-bottom: 40px;">Cerita Kami</h2>
-        <div id="story-list"></div>
-    </section>
-
-    <section data-aos="fade-up">
-        <div class="card" style="border: 1px dashed var(--gold);">
-            <h2 style="margin-bottom: 15px;">Kado Digital</h2>
-            <p style="font-size: 13px; margin-bottom: 25px; opacity: 0.8;">Doa restu Anda adalah kado terindah, namun jika ingin memberi melalui rekening:</p>
-            <div id="bank-info" style="font-weight: 600; color: var(--gold); font-size: 1.1rem; letter-spacing: 1px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px;"></div>
-        </div>
-    </section>
-
-    <section id="rsvp">
-        <div class="card" data-aos="fade-up">
-            <h2 style="margin-bottom: 25px;">Konfirmasi Kehadiran</h2>
-            <form id="rsvpForm">
-                <input type="text" id="r-nama" placeholder="Nama Lengkap" required style="width:100%; padding:14px; margin-bottom:12px; background:rgba(255,255,255,0.05); border:1px solid var(--gold); color:white; border-radius:8px;">
-                <select id="r-hadir" style="width:100%; padding:14px; margin-bottom:12px; background:var(--dark); border:1px solid var(--gold); color:white; border-radius:8px;">
-                    <option value="Hadir">Saya Akan Hadir</option>
-                    <option value="Tidak Hadir">Maaf, Tidak Bisa Hadir</option>
-                </select>
-                <input type="number" id="r-jumlah" placeholder="Jumlah Orang" min="1" max="5" value="1" style="width:100%; padding:14px; margin-bottom:12px; background:rgba(255,255,255,0.05); border:1px solid var(--gold); color:white; border-radius:8px;">
-                <textarea id="r-pesan" placeholder="Ucapan Doa (Opsional)" style="width:100%; padding:14px; margin-bottom:12px; background:rgba(255,255,255,0.05); border:1px solid var(--gold); color:white; border-radius:8px; height: 80px;"></textarea>
-                <button type="submit" class="btn-gold" style="width: 100%;" id="btnRsvp">KIRIM KONFIRMASI</button>
-            </form>
-            <p id="thx" style="display:none; color:var(--gold); margin-top:20px; font-weight:600;">Terima kasih, konfirmasi Anda telah kami simpan!</p>
-        </div>
-    </section>
-
-    <section>
-        <h3 style="margin-bottom: 20px; font-family: 'Playfair Display';">Ucapan Doa</h3>
-        <div id="wishes-list" style="text-align: left;"></div>
-    </section>
-    
-    <p style="text-align:center; font-size:10px; opacity:0.4; margin-bottom:40px; letter-spacing: 2px;">OMAH AKSARA INVITATION</p>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script>
-    // URL Web App Versi 4
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZNjJdSiqL373KT5Xlj_vPoq9wBlMNX-ys2YYN833yVdCRsuDCKmqMWnNGONz338UpHQ/exec";
-    
     const params = new URLSearchParams(window.location.search);
     const slug = params.get('u') || 'zeya-putra';
     const to = params.get('to') || 'Tamu Undangan';
 
     document.getElementById('guest-to').innerText = to;
 
-    // Fetch Data on Load
     fetch(SCRIPT_URL)
     .then(res => res.json())
     .then(data => {
         const d = data.config[slug];
-        if(!d) {
-            document.getElementById('loading-screen').innerText = "Data tidak ditemukan.";
-            return;
-        }
+        if(!d) return;
 
-        // Mapping Data ke HTML (Gunakan Lowercase karena script kita membersihkan header)
         document.getElementById('hero-bg').style.backgroundImage = `url('${d.foto_sampul}')`;
         document.getElementById('nama-utama').innerText = d.pria_nama.split(' ')[0] + " & " + d.wanita_nama.split(' ')[0];
         document.getElementById('p-foto').src = d.pria_foto;
         document.getElementById('p-nama').innerText = d.pria_nama;
-        document.getElementById('p-ortu').innerText = "Putra dari " + d.pria_ortu;
+        document.getElementById('p-ortu').innerText = d.pria_ortu;
         document.getElementById('w-foto').src = d.wanita_foto;
         document.getElementById('w-nama').innerText = d.wanita_nama;
-        document.getElementById('w-ortu').innerText = "Putri dari " + d.wanita_ortu;
-        document.getElementById('disp-tgl').innerText = d.waktu_display;
-        document.getElementById('disp-lokasi').innerText = d.resepsi_lokasi;
-        document.getElementById('btn-maps').href = d.map_resepsi;
+        document.getElementById('w-ortu').innerText = d.wanita_ortu;
         document.getElementById('bank-info').innerText = d.bank_data;
         document.getElementById('mSource').src = d.musik_url;
         document.getElementById('audio').load();
 
-        // Render Story
         let sHtml = "";
         for(let i=1; i<=3; i++) {
             if(d[`cerita_${i}_teks`]) {
-                sHtml += `
-                    <div class="story-card" data-aos="fade-up">
-                        <img src="${d[`foto_cerita_${i}`]}" class="story-img">
-                        <div class="story-text">${d[`cerita_${i}_teks`]}</div>
-                    </div>
-                `;
+                sHtml += `<div class="card" data-aos="fade-up">
+                            <img src="${d[`foto_cerita_${i}`]}" style="width:100%; border-radius:10px;">
+                            <p style="margin-top:15px;">${d[`cerita_${i}_teks`]}</p>
+                          </div>`;
             }
         }
         document.getElementById('story-list').innerHTML = sHtml;
 
-        // Render Ucapan
-        let wHtml = "";
-        const filteredWishes = data.wishes.filter(w => w.slug === slug);
-        filteredWishes.slice(0, 10).forEach(w => {
-            wHtml += `<div class="card" style="margin-bottom:10px; padding:15px; border-left:3px solid var(--gold);">
-                        <b style="color:var(--gold); font-size:14px;">${w.nama}</b><br>
-                        <small style="font-size:13px; opacity:0.8;">${w.ucapan}</small>
-                      </div>`;
-        });
-        document.getElementById('wishes-list').innerHTML = wHtml || "<p style='text-align:center; opacity:0.5;'>Belum ada ucapan.</p>";
-
-        initTimer(d.waktu_countdown);
-        document.getElementById('loading-screen').style.display = 'none';
-        AOS.init({ duration: 1000, once: true });
-    })
-    .catch(err => {
-        document.getElementById('loading-screen').innerText = "Gagal memuat data. Periksa koneksi atau izin spreadsheet.";
+        document.getElementById('loading').style.display = 'none';
+        AOS.init();
     });
 
     function openInv() {
         document.getElementById('content').style.display = 'block';
-        document.getElementById('mBtn').style.display = 'flex';
         document.getElementById('audio').play();
         window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
     }
-
-    function toggleMusic() {
-        const a = document.getElementById('audio');
-        a.paused ? a.play() : a.pause();
-    }
-
-    function initTimer(target) {
-        const targetDate = new Date(target.replace(' ', 'T')).getTime();
-        setInterval(() => {
-            const now = new Date().getTime();
-            const diff = targetDate - now;
-            if(diff < 0) return;
-            document.getElementById('d').innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
-            document.getElementById('h').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            document.getElementById('m').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            document.getElementById('s').innerText = Math.floor((diff % (1000 * 60)) / 1000);
-        }, 1000);
-    }
-
-    // Form Handling
-    document.getElementById('rsvpForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('btnRsvp');
-        btn.innerText = "Mengirim...";
-        btn.disabled = true;
-
-        const payload = {
-            type: "rsvp",
-            slug: slug,
-            nama: document.getElementById('r-nama').value,
-            hadir: document.getElementById('r-hadir').value,
-            jumlah: document.getElementById('r-jumlah').value,
-            pesan: document.getElementById('r-pesan').value
-        };
-
-        try {
-            await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(payload)
-            });
-            document.getElementById('rsvpForm').style.display = 'none';
-            document.getElementById('thx').style.display = 'block';
-        } catch (err) {
-            alert("Gagal mengirim konfirmasi. Coba lagi.");
-            btn.innerText = "KIRIM KONFIRMASI";
-            btn.disabled = false;
-        }
-    };
 </script>
 </body>
 </html>
