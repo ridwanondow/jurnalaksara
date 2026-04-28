@@ -16,7 +16,7 @@
         .font-accent { font-family: 'Cormorant Garamond', serif; font-style: italic; }
 
         /* Hero */
-        .hero { height: 100vh; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; position: relative; text-align: center; }
+        .hero { height: 100vh; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; position: relative; text-align: center; transition: background-image 1s ease-in-out; }
         .hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.2), var(--dark)); }
         .hero-content { position: relative; z-index: 10; padding: 20px; }
 
@@ -29,9 +29,9 @@
         .btn-gold:hover { transform: translateY(-3px); background: var(--sand); }
         
         /* Story Timeline */
-        .story-card { text-align: left; margin-bottom: 30px; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.02); }
-        .story-img { width: 100%; height: 220px; object-fit: cover; border-bottom: 2px solid var(--gold); }
-        .story-text { padding: 20px; font-size: 14px; opacity: 0.9; border-left: 2px solid var(--gold); margin: 0 20px 20px; }
+        .story-card { text-align: left; margin-bottom: 30px; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.02); border: 1px solid rgba(212, 175, 55, 0.1); }
+        .story-img { width: 100%; height: 250px; object-fit: cover; border-bottom: 2px solid var(--gold); }
+        .story-text { padding: 20px; font-size: 14px; opacity: 0.9; }
 
         /* Countdown */
         .timer-wrap { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
@@ -42,9 +42,12 @@
         .music-btn { position: fixed; bottom: 25px; left: 25px; z-index: 999; background: var(--gold); width: 50px; height: 50px; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 
         #content { display: none; }
+        #loading-screen { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
+
+<div id="loading-screen">Memuat Undangan...</div>
 
 <div class="music-btn" id="mBtn" onclick="toggleMusic()">🎵</div>
 <audio id="audio" loop><source id="mSource" src=""></audio>
@@ -52,7 +55,7 @@
 <section class="hero" id="hero-bg">
     <div class="hero-content" data-aos="fade-up">
         <p style="letter-spacing: 5px; font-size: 11px; margin-bottom: 10px;">THE WEDDING OF</p>
-        <h1 id="nama-utama" style="font-size: 3.5rem; margin-bottom: 20px;">Loading...</h1>
+        <h1 id="nama-utama" style="font-size: 3.2rem; margin-bottom: 20px;"></h1>
         <div class="card" style="background: rgba(0,0,0,0.5);">
             <p style="font-size: 12px; margin-bottom: 10px; opacity: 0.8;">Kepada Yth:</p>
             <h2 id="guest-to" style="margin-bottom: 25px; font-weight: 400;">Tamu Undangan</h2>
@@ -87,26 +90,27 @@
                 <div class="timer-box"><span id="s">0</span><small>Detik</small></div>
             </div>
             <div style="margin-top: 30px;">
-                <p class="font-accent" id="disp-lokasi" style="font-size: 1.2rem;"></p>
-                <a id="btn-maps" href="#" target="_blank" class="btn-gold" style="margin-top: 15px; padding: 10px 25px; font-size: 11px;">LIHAT LOKASI</a>
+                <h4 style="color:var(--gold);">Lokasi Acara</h4>
+                <p class="font-accent" id="disp-lokasi" style="font-size: 1.1rem; margin-bottom: 15px;"></p>
+                <a id="btn-maps" href="#" target="_blank" class="btn-gold" style="font-size: 11px;">BUKA GOOGLE MAPS</a>
             </div>
         </div>
     </section>
 
     <section>
-        <h2 class="font-accent" style="color: var(--gold); margin-bottom: 40px;">Cerita Cinta</h2>
+        <h2 class="font-accent" style="color: var(--gold); margin-bottom: 40px;">Cerita Kami</h2>
         <div id="story-list"></div>
     </section>
 
     <section data-aos="fade-up">
         <div class="card" style="border: 1px dashed var(--gold);">
             <h2 style="margin-bottom: 15px;">Kado Digital</h2>
-            <p style="font-size: 13px; margin-bottom: 25px; opacity: 0.8;">Doa restu Anda adalah kado terindah, namun jika ingin memberi lebih:</p>
-            <div id="bank-info" style="font-weight: 600; color: var(--gold); font-size: 1.2rem; letter-spacing: 1px;"></div>
+            <p style="font-size: 13px; margin-bottom: 25px; opacity: 0.8;">Doa restu Anda adalah kado terindah, namun jika ingin memberi melalui rekening:</p>
+            <div id="bank-info" style="font-weight: 600; color: var(--gold); font-size: 1.1rem; letter-spacing: 1px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px;"></div>
         </div>
     </section>
 
-    <section>
+    <section id="rsvp">
         <div class="card" data-aos="fade-up">
             <h2 style="margin-bottom: 25px;">Konfirmasi Kehadiran</h2>
             <form id="rsvpForm">
@@ -115,19 +119,26 @@
                     <option value="Hadir">Saya Akan Hadir</option>
                     <option value="Tidak Hadir">Maaf, Tidak Bisa Hadir</option>
                 </select>
+                <input type="number" id="r-jumlah" placeholder="Jumlah Orang" min="1" max="5" value="1" style="width:100%; padding:14px; margin-bottom:12px; background:rgba(255,255,255,0.05); border:1px solid var(--gold); color:white; border-radius:8px;">
+                <textarea id="r-pesan" placeholder="Ucapan Doa (Opsional)" style="width:100%; padding:14px; margin-bottom:12px; background:rgba(255,255,255,0.05); border:1px solid var(--gold); color:white; border-radius:8px; height: 80px;"></textarea>
                 <button type="submit" class="btn-gold" style="width: 100%;" id="btnRsvp">KIRIM KONFIRMASI</button>
             </form>
-            <p id="thx" style="display:none; color:var(--gold); margin-top:20px; font-weight:600;">Terima kasih, konfirmasi Anda telah kami terima.</p>
+            <p id="thx" style="display:none; color:var(--gold); margin-top:20px; font-weight:600;">Terima kasih, konfirmasi Anda telah kami simpan!</p>
         </div>
     </section>
+
+    <section>
+        <h3 style="margin-bottom: 20px; font-family: 'Playfair Display';">Ucapan Doa</h3>
+        <div id="wishes-list" style="text-align: left;"></div>
+    </section>
     
-    <p style="text-align:center; font-size:10px; opacity:0.5; margin-bottom:40px;">Made with Love by Omah Aksara</p>
+    <p style="text-align:center; font-size:10px; opacity:0.4; margin-bottom:40px; letter-spacing: 2px;">OMAH AKSARA INVITATION</p>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script>
-    // URL Web App kamu yang baru
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYGdYL4CPUiIz5w8PRm0mbHmZY8sDUM15CNwfXP9JkZ0Wr0j41B3LtrHfyimAqso3IJA/exec";
+    // URL Web App Versi 4
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZNjJdSiqL373KT5Xlj_vPoq9wBlMNX-ys2YYN833yVdCRsuDCKmqMWnNGONz338UpHQ/exec";
     
     const params = new URLSearchParams(window.location.search);
     const slug = params.get('u') || 'zeya-putra';
@@ -135,12 +146,17 @@
 
     document.getElementById('guest-to').innerText = to;
 
-    // Load Data
-    fetch(SCRIPT_URL).then(res => res.json()).then(data => {
+    // Fetch Data on Load
+    fetch(SCRIPT_URL)
+    .then(res => res.json())
+    .then(data => {
         const d = data.config[slug];
-        if(!d) return;
+        if(!d) {
+            document.getElementById('loading-screen').innerText = "Data tidak ditemukan.";
+            return;
+        }
 
-        // Populate Data Utama
+        // Mapping Data ke HTML (Gunakan Lowercase karena script kita membersihkan header)
         document.getElementById('hero-bg').style.backgroundImage = `url('${d.foto_sampul}')`;
         document.getElementById('nama-utama').innerText = d.pria_nama.split(' ')[0] + " & " + d.wanita_nama.split(' ')[0];
         document.getElementById('p-foto').src = d.pria_foto;
@@ -156,7 +172,7 @@
         document.getElementById('mSource').src = d.musik_url;
         document.getElementById('audio').load();
 
-        // Timeline Cerita
+        // Render Story
         let sHtml = "";
         for(let i=1; i<=3; i++) {
             if(d[`cerita_${i}_teks`]) {
@@ -170,9 +186,23 @@
         }
         document.getElementById('story-list').innerHTML = sHtml;
 
-        // Countdown
+        // Render Ucapan
+        let wHtml = "";
+        const filteredWishes = data.wishes.filter(w => w.slug === slug);
+        filteredWishes.slice(0, 10).forEach(w => {
+            wHtml += `<div class="card" style="margin-bottom:10px; padding:15px; border-left:3px solid var(--gold);">
+                        <b style="color:var(--gold); font-size:14px;">${w.nama}</b><br>
+                        <small style="font-size:13px; opacity:0.8;">${w.ucapan}</small>
+                      </div>`;
+        });
+        document.getElementById('wishes-list').innerHTML = wHtml || "<p style='text-align:center; opacity:0.5;'>Belum ada ucapan.</p>";
+
         initTimer(d.waktu_countdown);
+        document.getElementById('loading-screen').style.display = 'none';
         AOS.init({ duration: 1000, once: true });
+    })
+    .catch(err => {
+        document.getElementById('loading-screen').innerText = "Gagal memuat data. Periksa koneksi atau izin spreadsheet.";
     });
 
     function openInv() {
@@ -200,7 +230,7 @@
         }, 1000);
     }
 
-    // RSVP POST
+    // Form Handling
     document.getElementById('rsvpForm').onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btnRsvp');
@@ -212,8 +242,8 @@
             slug: slug,
             nama: document.getElementById('r-nama').value,
             hadir: document.getElementById('r-hadir').value,
-            jumlah: 1,
-            pesan: ""
+            jumlah: document.getElementById('r-jumlah').value,
+            pesan: document.getElementById('r-pesan').value
         };
 
         try {
@@ -225,8 +255,8 @@
             document.getElementById('rsvpForm').style.display = 'none';
             document.getElementById('thx').style.display = 'block';
         } catch (err) {
-            alert("Terjadi kesalahan, coba lagi.");
-            btn.innerText = "KIRIM KONFRI MASI";
+            alert("Gagal mengirim konfirmasi. Coba lagi.");
+            btn.innerText = "KIRIM KONFIRMASI";
             btn.disabled = false;
         }
     };
